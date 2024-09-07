@@ -1,0 +1,29 @@
+# Use the official Ubuntu image as a base
+FROM ubuntu:latest
+
+# Set the working directory
+WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv
+
+# Create a virtual environment
+RUN python3 -m venv /env
+
+# Activate the virtual environment and install Python packages
+COPY requirements.txt /app/
+RUN /env/bin/pip install --upgrade pip && \
+    /env/bin/pip install -r requirements.txt
+
+# Copy the application code
+COPY devops /app
+
+# Set environment variables to use the virtual environment
+ENV PATH="/env/bin:$PATH"
+
+# Set the entrypoint for the container
+ENTRYPOINT ["python3"]
+
+# Default command to run when the container starts
+CMD ["manage.py", "runserver", "0.0.0.0:8000"]
